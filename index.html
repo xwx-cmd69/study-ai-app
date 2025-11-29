@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Study Summarizer</title>
+  <!-- Simple mobile-friendly CSS -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f4f4f9;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      max-width: 400px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input[type="file"] {
+      margin-bottom: 15px;
+    }
+    button {
+      padding: 10px;
+      background: #2c3e50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #34495e;
+    }
+    .output {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .output h2 {
+      margin-top: 0;
+    }
+    .quiz-question {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>PDF Study Summarizer</h1>
+
+  <form id="pdfForm">
+    <input type="file" id="pdfInput" accept=".pdf" required>
+    <button type="submit">Upload and Summarize</button>
+  </form>
+
+  <div class="output" id="result" style="display:none;">
+    <h2>Summary:</h2>
+    <p id="summary"></p>
+
+    <h2>Quiz:</h2>
+    <div id="quiz"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("pdfForm");
+    const pdfInput = document.getElementById("pdfInput");
+    const resultDiv = document.getElementById("result");
+    const summaryP = document.getElementById("summary");
+    const quizDiv = document.getElementById("quiz");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (!pdfInput.files.length) return alert("Please select a PDF.");
+
+      const file = pdfInput.files[0];
+      const formData = new FormData();
+      formData.append("pdf", file);
+
+      summaryP.textContent = "Processing...";
+      quizDiv.innerHTML = "";
+      resultDiv.style.display = "block";
+
+      try {
+        const response = await fetch("/process-pdf", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to process PDF");
+        }
+
+        const data = await response.json();
+        summaryP.textContent = data.summary || "No summary available.";
+
+        if (data.quiz && data.quiz.length) {
+          data.quiz.forEach((q, i) => {
+            const qDiv = document.createElement("div");
+            qDiv.className = "quiz-question";
+            qDiv.textContent = `${i + 1}. ${q.question} (Answer: ${q.correctAnswer})`;
+            quizDiv.appendChild(qDiv);
+          });
+        } else {
+          quizDiv.textContent = "No quiz available.";
+        }
+
+      } catch (err) {
+        summaryP.textContent = "Error: " + err.message;
+        quizDiv.textContent = "";
+      }
+    });
+  </script>
+</body>
+</html>
