@@ -5,6 +5,9 @@ const pdfParse = require("pdf-parse");
 const app = express();
 app.use(fileUpload());
 
+const path = require("path");
+app.use(express.static(path.join(__dirname, "public")));
+
 app.use(express.static("public"));
 
 // Quick text summary generator
@@ -54,8 +57,8 @@ app.post("/process-pdf", async (req, res) => {
     }
 });
 
-app.get("/", (req, res) => {
-    res.send("PDF Summarizer Backend Running.");
+//app.get("/", (req, res) => {
+    //res.send("PDF Summarizer Backend Running.");//
 });
 
 const port = process.env.PORT || 3000;
