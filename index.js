@@ -8,7 +8,7 @@ app.use(fileUpload());
 const path = require("path");
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use(express.static("public"));
+
 
 // Quick text summary generator
 function summarizeText(text) {
