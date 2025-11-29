@@ -5,6 +5,8 @@ const pdfParse = require("pdf-parse");
 const app = express();
 app.use(fileUpload());
 
+app.use(express.static("public"));
+
 // Quick text summary generator
 function summarizeText(text) {
     let sentences = text.split(".").filter(s => s.trim().length > 0);
