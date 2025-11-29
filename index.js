@@ -6,9 +6,7 @@ const app = express();
 app.use(fileUpload());
 
 const path = require("path");
-app.use(express.static(path.join(__dirname, "public")));
-
-
+app.use(express.static(__dirname)); // now serves files in root
 
 // Quick text summary generator
 function summarizeText(text) {
